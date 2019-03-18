@@ -6,6 +6,7 @@ import (
 	"golang.org/x/net/websocket"
 	"go-websocket/service"
 )
+
 func main() {
 	//创建服务对象
 	ws := service.WebSocketService{}
@@ -21,8 +22,10 @@ func main() {
 	http.Handle("/", websocket.Handler(ws.Handler))
 	//创建文件服务器
 	http.Handle("/test/", http.FileServer(http.Dir("./")))
+	//创建Swagger服务
+	http.Handle("/swagger/", http.FileServer(http.Dir("./")))
 
-	//添加Rest接口
+	//添加RESTFUL接口
 	http.HandleFunc("/publish", api.Publish)
 
 	//开始监听

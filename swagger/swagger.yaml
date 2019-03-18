@@ -1,0 +1,31 @@
+openapi: 3.0.0
+info:
+  title: 'WebSocket Api'
+  description: 'WebSocket Api Doc'
+  contact:
+    email: evondu1991@163.com
+  version: '0.1'
+paths:
+  /publish:
+    post:
+      tags:
+        - WebSocket
+      summary: 广播信息
+      description: 向所有WebSocket客户端发送信息
+      operationId: 'api\controllers\AmqpController::actionSend'
+      parameters:
+        -
+          name: message
+          in: query
+          description: 信息内容
+          required: true
+          schema:
+            type: string
+            default: 测试信息
+      responses:
+        default:
+          description: 返回结果
+tags:
+  -
+    name: WebSocket
+    description: WebSocket
