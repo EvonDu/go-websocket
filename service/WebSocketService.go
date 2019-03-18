@@ -2,7 +2,6 @@ package service
 
 import (
 	"golang.org/x/net/websocket"
-	"fmt"
 )
 
 //定义结构体
@@ -17,33 +16,51 @@ type WebSocketService struct {
 //WebSocket处理函数
 func (t *WebSocketService) Handler(ws *websocket.Conn) {
 	//执行事件客户端连接
-	t.Connects = append(t.Connects, ws)
-	for i:=0;i<len(t.EventOnConnect);i++ {
-		t.EventOnConnect[i](ws)
-	}
-
+	t.onConnect(ws)
 	//轮询
 	request := make([]byte, 512)
 	for {
 		//读取客户端内容
-		read, err := ws.Read(request)
-		if err != nil{
-			fmt.Printf(" Err : %s\n", err.Error())
-		}
-
+		read, _ := ws.Read(request)
 		//检查WebSocket是否断开
 		if read == 0 {
-			for i:=0;i<len(t.EventOnClose);i++ {
-				t.EventOnClose[i](ws)
-			}
+			t.onClose(ws)
 			break
 		}
-
 		//接受客户端信息
 		data := string(request[:read])
-		for i:=0;i<len(t.EventOnMessage);i++ {
-			t.EventOnMessage[i](ws, data)
+		t.onMessage(ws, data)
+	}
+}
+
+//连接客户端
+func (t *WebSocketService) onConnect(ws *websocket.Conn) {
+	//执行事件客户端连接
+	t.Connects = append(t.Connects, ws)
+	for i:=0;i<len(t.EventOnConnect);i++ {
+		t.EventOnConnect[i](ws)
+	}
+}
+
+//断开客户端
+func (t *WebSocketService) onClose(ws *websocket.Conn) {
+	//移除连接
+	for i:=0;i<len(t.Connects);i++{
+		if t.Connects[i] == ws {
+			t.Connects = append(t.Connects[:i], t.Connects[i+1:]...)
 		}
+	}
+	//触发事件
+	for i:=0;i<len(t.EventOnClose);i++ {
+		t.EventOnClose[i](ws)
+	}
+}
+
+//接受客户端信息
+func (t *WebSocketService) onMessage(ws *websocket.Conn, data string) {
+	//触发事件
+	for i:=0;i<len(t.EventOnMessage);i++ {
+		t.EventOnMessage[i](ws, data)
 	}
 }
 
