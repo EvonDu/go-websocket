@@ -27,6 +27,7 @@ func main() {
 
 	//添加RESTFUL接口
 	http.HandleFunc("/publish", api.Publish)
+	http.HandleFunc("/count", api.Count)
 
 	//开始监听
 	e := http.ListenAndServe(":8080", nil)

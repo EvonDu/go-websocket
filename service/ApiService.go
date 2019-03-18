@@ -3,6 +3,7 @@ package service
 import (
 	"fmt"
 	"net/http"
+	"strconv"
 )
 
 /**
@@ -13,8 +14,8 @@ type ApiService struct {
 }
 
 /**
- * 创建订单
- * @OA\Post(
+ * 广播信息
+ * @OA\Get(
  *      path="/publish",
  *      tags={"WebSocket"},
  *      summary="广播信息",
@@ -37,5 +38,20 @@ func (t *ApiService) Publish(w http.ResponseWriter, r *http.Request) {
 	t.WebSocketService.Publish(message)
 
 	//接口返回
-	fmt.Fprintln(w, "success publish message : "+message)
+	fmt.Fprintln(w, "Success publish message : "+message)
+}
+
+/**
+ * 连接数量
+ * @OA\Get(
+ *      path="/count",
+ *      tags={"WebSocket"},
+ *      summary="连接数量",
+ *      description="获取当前WebSocket客户端的连接数量",
+ *      @OA\Response(response="default", description="返回结果"),
+ * )
+ */
+func (t *ApiService) Count(w http.ResponseWriter, r *http.Request) {
+	//接口返回
+	fmt.Fprintln(w, "Client connect count : "+strconv.Itoa(len(t.WebSocketService.Connects)))
 }

@@ -6,13 +6,21 @@ info:
     email: evondu1991@163.com
   version: '0.1'
 paths:
+  /count:
+    get:
+      tags:
+        - WebSocket
+      summary: 连接数量
+      description: 获取当前WebSocket客户端的连接数量
+      responses:
+        default:
+          description: 返回结果
   /publish:
-    post:
+    get:
       tags:
         - WebSocket
       summary: 广播信息
       description: 向所有WebSocket客户端发送信息
-      operationId: 'api\controllers\AmqpController::actionSend'
       parameters:
         -
           name: message
