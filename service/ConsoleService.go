@@ -8,11 +8,17 @@ import (
 	"strconv"
 )
 
-type Console struct {
+type ConsoleService struct {
 	WebSocketService *WebSocketService
 }
 
-func (t *Console) Run(ch chan string){
+func (t *ConsoleService) Run(){
+	//执行协程
+	var ch chan string
+	go t.main(ch)
+}
+
+func (t *ConsoleService) main(ch chan string){
 	//帮助信息
 	t.welcome()
 	//等待命令
@@ -36,20 +42,21 @@ func (t *Console) Run(ch chan string){
 	}
 }
 
-func (t *Console) welcome(){
+func (t *ConsoleService) welcome(){
 	fmt.Print("-------------------------------- GO WEBSOCKET --------------------------------------- \n")
 	fmt.Print("Service        Listen                          processes      status \n")
 	fmt.Print("WebSocket      ws://0.0.0.0:8080               1              [ok] \n")
 	fmt.Print("Http           http://127.0.0.1:8080/test      1              [ok] \n")
+	fmt.Print("------------------------------------------------------------------------------------- \n")
 	fmt.Print("[*] Waiting for commad. To exit press CTRL+C \n")
 	fmt.Print("[*] Please enter a command( enter 'help' to view ): \n")
 }
 
-func (t *Console) help(){
+func (t *ConsoleService) help(){
 	fmt.Print("[*] help		Help message. \n")
 	fmt.Print("[*] count		Client coonect count. \n")
 }
 
-func (t *Console) count(){
+func (t *ConsoleService) count(){
 	fmt.Print("[*] Client connect count : " + strconv.Itoa(len(t.WebSocketService.Connects)) + "\n")
 }

@@ -11,9 +11,10 @@ func main() {
 	//创建服务对象
 	ws := service.WebSocketService{}
 	api := service.ApiService{WebSocketService:&ws}
+	con := service.ConsoleService{WebSocketService:&ws}
 
-	//创建协程
-	Console(&ws)
+	//命令行服务启动
+	con.Run()
 
 	//添加事件
 	Events(&ws)
@@ -39,11 +40,4 @@ func Events(ws *service.WebSocketService){
 	ws.AddOnConnect(func(ws *websocket.Conn) {
 		fmt.Print("client connect.\n")
 	})
-}
-
-//命令行协程
-func Console(ws *service.WebSocketService){
-	con := service.Console{WebSocketService:ws}
-	var ch chan string
-	go con.Run(ch)
 }
