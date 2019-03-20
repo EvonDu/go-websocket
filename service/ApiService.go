@@ -13,6 +13,12 @@ type ApiService struct {
 	WebSocketService *WebSocketService
 }
 
+// 开始监听API
+func (t *ApiService) Listen(){
+	http.HandleFunc("/publish", t.Publish)
+	http.HandleFunc("/count", t.Count)
+}
+
 /**
  * 广播信息
  * @OA\Get(

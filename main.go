@@ -13,8 +13,9 @@ func main() {
 	api := service.ApiService{WebSocketService:&ws}
 	con := service.ConsoleService{WebSocketService:&ws}
 
-	//命令行服务启动
+	//服务启动
 	con.Run()
+	api.Listen()
 
 	//添加事件
 	Events(&ws)
@@ -25,10 +26,6 @@ func main() {
 	http.Handle("/test/", http.FileServer(http.Dir("./")))
 	//创建Swagger服务
 	http.Handle("/swagger/", http.FileServer(http.Dir("./")))
-
-	//添加RESTFUL接口
-	http.HandleFunc("/publish", api.Publish)
-	http.HandleFunc("/count", api.Count)
 
 	//开始监听
 	e := http.ListenAndServe(":8080", nil)
