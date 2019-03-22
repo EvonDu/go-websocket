@@ -10,14 +10,16 @@ import (
 //定义结构体
 type WebSocketService struct {
 	core.BaseWebSocket
+	Config				*core.Config
 }
 
 // 开始监听WebSocket
 func (t *WebSocketService) Listen(){
 	//设置服务
 	http.Handle("/", websocket.Handler(t.Handler))
-	http.Handle("/test/", http.FileServer(http.Dir("./")))
-	http.Handle("/swagger/", http.FileServer(http.Dir("./")))
+	if t.Config.Test {
+		http.Handle("/test/", http.FileServer(http.Dir("./")))
+	}
 
 	//添加事件
 	t.registerEvents(t)

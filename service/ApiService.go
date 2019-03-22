@@ -4,17 +4,25 @@ import (
 	"fmt"
 	"net/http"
 	"strconv"
+	"go-websocket/core"
 )
 
 /**
  * @OA\Tag(name="WebSocket",description="WebSocket")
  */
 type ApiService struct {
-	WebSocketService *WebSocketService
+	Config				*core.Config
+	WebSocketService	*WebSocketService
 }
 
 // 开始监听API
 func (t *ApiService) Listen(){
+	//注册文档
+	if t.Config.Swagger {
+		http.Handle("/swagger/", http.FileServer(http.Dir("./")))
+	}
+
+	//注册接口
 	http.HandleFunc("/publish", t.Publish)
 	http.HandleFunc("/count", t.Count)
 }
