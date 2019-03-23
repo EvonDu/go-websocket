@@ -6,11 +6,13 @@ import (
 	"net/http"
 	"golang.org/x/net/websocket"
 	"fmt"
+	"time"
 )
 
 //定义客户端
 type Client struct {
 	Id			string
+	Time		time.Time
 	Connect		*websocket.Conn
 }
 
@@ -37,6 +39,17 @@ func (t *WebSocketService) Listen(){
 // 原始事件注册
 func (t *WebSocketService) registerEvents(ws *WebSocketService){
 	ws.AddOnMessage(t.onMessage)
+	ws.AddOnClose(t.onClose)
+}
+
+// 客户端连接关闭（注销注册）
+func (t *WebSocketService) onClose(ws *websocket.Conn) {
+	//从客户端列表中移除
+	for i:=0;i<len(t.Clients);i++{
+		if t.Clients[i].Connect == ws {
+			t.Clients = append(t.Clients[:i], t.Clients[i+1:]...)
+		}
+	}
 }
 
 // 接受客户端信息（按照报文扩展事件）
@@ -68,7 +81,7 @@ func (t *WebSocketService) onMessage(ws *websocket.Conn, data string) {
 func (t *WebSocketService) extendOnLogin(ws *websocket.Conn, data interface{}, to interface{}) {
 	// 注册客户端
 	id := data.(string)
-	client := Client{Id:id, Connect:ws}
+	client := Client{Id:id, Time:time.Now() ,Connect:ws}
 	t.Clients = append(t.Clients, &client)
 }
 
