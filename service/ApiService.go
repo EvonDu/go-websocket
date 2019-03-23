@@ -1,11 +1,10 @@
 package service
 
 import (
-	"fmt"
 	"net/http"
-	"strconv"
-	"go-websocket/core"
 	"io/ioutil"
+	"go-websocket/core"
+	"encoding/json"
 )
 
 /**
@@ -29,6 +28,23 @@ func (t *ApiService) Listen(){
 	http.HandleFunc("/publish", t.Publish)
 }
 
+// 按接口结构输出结果
+func (t *ApiService) apiResponse(w http.ResponseWriter, r *http.Request, code int, message string, data interface{}){
+	//设置HTTP头
+	w.Header().Set("Access-Control-Allow-Origin","*")
+	w.Header().Set("Content-type","application/json;charset='utf-8'")
+
+	//设置返回格式
+	result := make(map[string]interface{})
+	result["code"] = code
+	result["message"] = message
+	result["data"] = data
+
+	//设置返回内容
+	response,_ := json.Marshal(result)
+	w.Write(response)
+}
+
 /**
  * 连接数量
  * @OA\Get(
@@ -41,7 +57,7 @@ func (t *ApiService) Listen(){
  */
 func (t *ApiService) Count(w http.ResponseWriter, r *http.Request) {
 	//接口返回
-	fmt.Fprintln(w, "Client connect count : "+strconv.Itoa(len(t.WebSocketService.Connects)))
+	t.apiResponse(w, r, 0, "OK", len(t.WebSocketService.Connects))
 }
 
 /**
@@ -63,11 +79,8 @@ func (t *ApiService) Clients(w http.ResponseWriter, r *http.Request) {
 		item["Time"] = t.WebSocketService.Clients[i].Time.Format("2006-01-02 15:04:05")
 		list = append(list, item)
 	}
-	//输出
-	fmt.Fprintln(w, "Client id list : ")
-	for i:=0;i<len(list);i++ {
-		fmt.Fprintln(w, list[i])
-	}
+	//接口返回
+	t.apiResponse(w, r, 0, "OK", list)
 }
 
 /**
@@ -82,22 +95,11 @@ func (t *ApiService) Clients(w http.ResponseWriter, r *http.Request) {
  * )
  */
 func (t *ApiService) Publish(w http.ResponseWriter, r *http.Request) {
-	//获取参数(GET)
-	/*r.ParseForm()
-	var message string
-	if len(r.Form["message"]) > 0 {
-		message = r.Form["message"][0]
-	} else {
-		message = ""
-	}*/
-
 	//获取参数(BODY)
 	body, _ := ioutil.ReadAll(r.Body)
 	message := string(body)
-
 	//广播消息
 	t.WebSocketService.Publish(message)
-
 	//接口返回
-	fmt.Fprintln(w, "Success publish message : "+message)
+	t.apiResponse(w, r, 0, "OK", message)
 }
