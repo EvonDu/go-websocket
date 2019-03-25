@@ -9,25 +9,16 @@ paths:
   /count:
     get:
       tags:
-        - WebSocket
+        - Base
       summary: 连接数量
       description: 获取当前WebSocket客户端的连接数量
-      responses:
-        default:
-          description: 返回结果
-  /clients:
-    get:
-      tags:
-        - WebSocket
-      summary: 连接列表
-      description: 获取所有注册过的客户端列表
       responses:
         default:
           description: 返回结果
   /publish:
     post:
       tags:
-        - WebSocket
+        - Base
       summary: 广播信息
       description: 向所有WebSocket客户端发送信息
       requestBody:
@@ -37,7 +28,43 @@ paths:
       responses:
         default:
           description: 返回结果
+  /clients:
+    get:
+      tags:
+        - Extend
+      summary: 连接列表
+      description: 获取所有注册过的客户端列表
+      responses:
+        default:
+          description: 返回结果
+  /events:
+    post:
+      tags:
+        - Extend
+      summary: 发送事件
+      description: 向所有WebSocket客户端发送事件信息
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              properties:
+                event:
+                  description: 事件
+                  type: string
+                  default: publish
+                data:
+                  description: 数据
+                  type: string
+                  default: test
+              type: object
+      responses:
+        default:
+          description: 返回结果
 tags:
   -
-    name: WebSocket
-    description: WebSocket
+    name: Base
+    description: 基础
+  -
+    name: Extend
+    description: 扩展

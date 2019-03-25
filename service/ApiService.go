@@ -24,8 +24,9 @@ func (t *ApiService) Listen(){
 
 	//注册接口
 	http.HandleFunc("/count", t.Count)
-	http.HandleFunc("/clients", t.Clients)
 	http.HandleFunc("/publish", t.Publish)
+	http.HandleFunc("/clients", t.Clients)
+	http.HandleFunc("/events", t.Events)
 }
 
 // 按接口结构输出结果
@@ -61,6 +62,27 @@ func (t *ApiService) Count(w http.ResponseWriter, r *http.Request) {
 }
 
 /**
+ * 广播信息
+ * @OA\Post(
+ *      path="/publish",
+ *      tags={"WebSocket"},
+ *      summary="广播信息",
+ *      description="向所有WebSocket客户端发送信息",
+ *      @OA\Parameter(name="message", required=true, in="query",description="信息内容", @OA\Schema(type="string", default="测试信息")),
+ *      @OA\Response(response="default", description="返回结果"),
+ * )
+ */
+func (t *ApiService) Publish(w http.ResponseWriter, r *http.Request) {
+	//获取参数(BODY)
+	body, _ := ioutil.ReadAll(r.Body)
+	message := string(body)
+	//广播消息
+	t.WebSocketService.Publish(message)
+	//接口返回
+	t.apiResponse(w, r, 0, "OK", message)
+}
+
+/**
  * 连接列表
  * @OA\Get(
  *      path="/clients",
@@ -84,22 +106,32 @@ func (t *ApiService) Clients(w http.ResponseWriter, r *http.Request) {
 }
 
 /**
- * 广播信息
+ * 发送事件
  * @OA\Post(
- *      path="/publish",
- *      tags={"WebSocket"},
- *      summary="广播信息",
- *      description="向所有WebSocket客户端发送信息",
- *      @OA\Parameter(name="message", required=true, in="query",description="信息内容", @OA\Schema(type="string", default="测试信息")),
+ *      path="/events",
+ *      tags={"Extend"},
+ *      summary="发送事件",
+ *      description="向所有WebSocket客户端发送事件信息",
+ *      @OA\RequestBody(required=true, @OA\MediaType(
+ *          mediaType="application/x-www-form-urlencoded", @OA\Schema(
+ *              @OA\Property(description="事件", property="event", type="string"),
+ *              @OA\Property(description="数据", property="data", type="string"),
+ *          )
+ *      )),
  *      @OA\Response(response="default", description="返回结果"),
  * )
  */
-func (t *ApiService) Publish(w http.ResponseWriter, r *http.Request) {
-	//获取参数(BODY)
-	body, _ := ioutil.ReadAll(r.Body)
-	message := string(body)
-	//广播消息
-	t.WebSocketService.Publish(message)
+func (t *ApiService) Events(w http.ResponseWriter, r *http.Request) {
+	//获取参数
+	event := r.PostFormValue("event")
+	data := r.PostFormValue("data")
+	// 整理格式
+	result := make(map[string]string)
+	result["__event"] = event
+	result["data"] = data
+	response,_ := json.Marshal(result)
+	// 发布信息
+	t.WebSocketService.Publish(string(response))
 	//接口返回
-	t.apiResponse(w, r, 0, "OK", message)
+	t.apiResponse(w, r, 0, "OK", result)
 }
