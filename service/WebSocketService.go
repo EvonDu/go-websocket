@@ -67,8 +67,8 @@ func (t *WebSocketService) onMessage(ws *websocket.Conn, data string) {
 	json.Unmarshal([]byte(data), &request)
 
 	//事件处理
-	if request["__event"] != nil && request["data"] != nil {
-		event := request["__event"].(string)
+	if request["event"] != nil && request["data"] != nil {
+		event := request["event"].(string)
 		data := request["data"]
 		to := request["to"]
 		if events[event] != nil {
@@ -89,7 +89,7 @@ func (t *WebSocketService) extendOnLogin(ws *websocket.Conn, data interface{}, t
 func (t *WebSocketService) extendOnPublish(ws *websocket.Conn, data interface{}, to interface{}) {
 	// 整理格式
 	result := make(map[string]string)
-	result["__event"] = "publish"
+	result["event"] = "publish"
 	result["data"] = data.(string)
 	response,_ := json.Marshal(result)
 	// 发布信息
@@ -100,7 +100,7 @@ func (t *WebSocketService) extendOnPublish(ws *websocket.Conn, data interface{},
 func (t *WebSocketService) extendOnPrivate(ws *websocket.Conn, data interface{}, to interface{}){
 	// 整理格式
 	result := make(map[string]string)
-	result["__event"] = "private"
+	result["event"] = "private"
 	result["data"] = data.(string)
 	response,_ := json.Marshal(result)
 	// 发布信息

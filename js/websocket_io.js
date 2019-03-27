@@ -12,13 +12,13 @@ var websocket_io = function(sdn,id){
 
     // 发送信息
     this.send = function(event, data){
-        ws.send(JSON.stringify({"__event":event, "data":data}));
+        ws.send(JSON.stringify({"event":event, "data":data}));
     };
 
     // 连接成功
     ws.onopen = function() {
         // 发送登录信息
-        ws.send(JSON.stringify({"__event":"login", "data":self.id}));
+        ws.send(JSON.stringify({"event":"login", "data":self.id}));
         // 触发事件
         if(typeof self.onopen === 'function')
             self.onopen();
@@ -43,10 +43,10 @@ var websocket_io = function(sdn,id){
             json = null
         }
         //判断报文触发事件
-        if(json && json.__event && json.data){
+        if(json && json.event && json.data){
             // 触发事件
-            if(typeof self.onevent[json.__event] === 'function')
-                self.onevent[json.__event](json.data);
+            if(typeof self.onevent[json.event] === 'function')
+                self.onevent[json.event](json.data);
         } else {
             // 触发事件
             if(typeof self.onmessage === 'function')

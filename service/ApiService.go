@@ -129,7 +129,7 @@ func (t *ApiService) Events(w http.ResponseWriter, r *http.Request) {
 	to := r.PostFormValue("to")
 	// 整理格式
 	result := make(map[string]string)
-	result["__event"] = event
+	result["event"] = event
 	result["data"] = data
 	response,_ := json.Marshal(result)
 	// 发布信息
