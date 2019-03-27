@@ -1,10 +1,13 @@
+<?php
+    $config = include "../config/main.php";
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>测试服务端</title>
+    <title>测试客户端</title>
     <script src="assets/layui/layui.js"></script>
-    <script src="assets/jquery/jquery-3.2.1.min.js"></script>
     <link rel="stylesheet" href="assets/layui/css/layui.css"/>
     <link rel="stylesheet" href="assets/layui/css/modules/code.css"/>
     <link rel="stylesheet" href="css/main.css"/>
@@ -25,24 +28,47 @@
     layui.use('code', function(){
         //初始化面板
         layui.code({skin: 'notepad'});
+        //初始化ws服务
+        websocketInit();
     });
 </script>
 <!-- ws -->
 <script>
+    //ws操作
+    ws = null;
+    connecting = false;
+    function websocketInit(){
+        ws = new WebSocket("ws://127.0.0.1:8080");
+        ws.onopen = function() {
+            connecting = true;
+            printMessage("连接成功!");
+        };
+        ws.onclose = function() {
+            connecting = false;
+            printMessage("连接断开!");
+        };
+        ws.onmessage = function(e) {
+            printMessage("收到消息："+ e.data);
+        };
+    }
+
     //发送信息
     function sendMessage(){
+        //过滤断开状态
+        if(!connecting)
+            return;
+
         //获取元素
         var input = document.getElementsByName('input')[0];
 
         //发送信息
-        $.ajax({
-            url:"../api/publish.php",
-            data:{"msg":input.value},
-            success:function(res){
-                printMessage("接口返回:"+JSON.stringify(res));
-                input.value = "";
-            }
-        });
+        ws.send(input.value);
+
+        //输出信息
+        printMessage("发送消息："+input.value);
+
+        //清空信息
+        input.value = "";
     }
 
     //输出信息

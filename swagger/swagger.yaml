@@ -19,12 +19,17 @@ paths:
     post:
       tags:
         - Base
-      summary: 广播信息
+      summary: 发布信息
       description: 向所有WebSocket客户端发送信息
-      requestBody:
-        required: true
-        content:
-          application/json: {  }
+      parameters:
+        -
+          name: message
+          in: query
+          description: 信息内容
+          required: true
+          schema:
+            type: string
+            default: 测试信息
       responses:
         default:
           description: 返回结果
@@ -41,8 +46,8 @@ paths:
     post:
       tags:
         - Extend
-      summary: 发送事件
-      description: 向所有WebSocket客户端发送事件信息
+      summary: 发布事件
+      description: 向所有登录的WebSocket客户端发布事件信息
       requestBody:
         required: true
         content:
@@ -50,13 +55,16 @@ paths:
             schema:
               properties:
                 event:
-                  description: 事件
+                  description: 事件名称
                   type: string
                   default: publish
-                data:
-                  description: 数据
+                to:
+                  description: 目标编号
                   type: string
-                  default: test
+                data:
+                  description: 信息内容
+                  type: string
+                  default: 'sample data'
               type: object
       responses:
         default:

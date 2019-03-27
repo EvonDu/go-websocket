@@ -28,8 +28,8 @@ var websocket_io = function(sdn,id){
     // 关闭连接
     ws.onclose = function() {
         // 触发事件
-        if(typeof self.close === 'function')
-            self.close();
+        if(typeof self.onclose === 'function')
+            self.onclose();
         // DEBUG
         console.log("[*] WebSocket close.");
     };

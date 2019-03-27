@@ -77,7 +77,7 @@ func (t *WebSocketService) onMessage(ws *websocket.Conn, data string) {
 	}
 }
 
-// 扩展事件：用户登录
+// 扩展事件(服务端事件)：用户登录
 func (t *WebSocketService) extendOnLogin(ws *websocket.Conn, data interface{}, to interface{}) {
 	// 注册客户端
 	id := data.(string)
@@ -85,7 +85,7 @@ func (t *WebSocketService) extendOnLogin(ws *websocket.Conn, data interface{}, t
 	t.Clients = append(t.Clients, &client)
 }
 
-// 扩展事件：发布信息
+// 扩展事件(服务端事件)：发布信息
 func (t *WebSocketService) extendOnPublish(ws *websocket.Conn, data interface{}, to interface{}) {
 	// 整理格式
 	result := make(map[string]string)
@@ -93,5 +93,37 @@ func (t *WebSocketService) extendOnPublish(ws *websocket.Conn, data interface{},
 	result["data"] = data.(string)
 	response,_ := json.Marshal(result)
 	// 发布信息
-	t.BaseWebSocket.Publish(string(response))
+	t.SendAll(response)
+}
+
+// 扩展事件(服务端事件)：私聊信息
+func (t *WebSocketService) extendOnPrivate(ws *websocket.Conn, data interface{}, to interface{}){
+	// 整理格式
+	result := make(map[string]string)
+	result["__event"] = "private"
+	result["data"] = data.(string)
+	response,_ := json.Marshal(result)
+	// 发布信息
+	t.Send(to.(string), response)
+}
+
+// 向指定客户端发送信息
+func (t *WebSocketService) Send(to string, data []byte){
+	// 遍历链接
+	for i:=0;i<len(t.Clients);i++ {
+		// 判断发送对象ID
+		if t.Clients[i].Id == to {
+			t.Clients[i].Connect.Write(data)
+			break
+		}
+	}
+}
+
+// 向全部客户端发送信息
+func (t *WebSocketService) SendAll(data []byte){
+	// 遍历链接
+	for i:=0;i<len(t.Clients);i++ {
+		// 发送信息
+		t.Clients[i].Connect.Write(data)
+	}
 }
