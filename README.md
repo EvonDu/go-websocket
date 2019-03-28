@@ -11,17 +11,17 @@ Golang搭建的WebSocket服务框架，可以直接当一个基础的WebSocket�
 -t   | test    | fasle  | 开启调试页面
 -s   | swagger | false  | 开启接口文档
 
-## 命令行调试
+## 控制台操作
 
-参数    | 说明
---------|--------------
-help    | 帮助信息
-count   | 当前连接数量
-connect | 客户端列表
+参数    | 例子                | 说明
+--------|---------------------|-------------
+help    | help                | 帮助信息
+count   | count               | 当前连接数量
+connect | connect             | 客户端列表
+publish | publish HelloWord!  | 向所有WebSocket发布信息
 
 ## 使用例子
-#### Html
-需要引入javascript：`js/websocket_io.js`
+需要引入javascript：`/js/websocket_io.js`
 ```
 ws = new websocket_io("ws://127.0.0.1:8080");
 ws.onopen = function() {

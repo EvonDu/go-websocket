@@ -55,7 +55,7 @@ func (t *WebSocketService) onClose(ws *websocket.Conn) {
 // 接受客户端信息（按照报文扩展事件）
 func (t *WebSocketService) onMessage(ws *websocket.Conn, data string) {
 	//DEBUG
-	fmt.Print("[*] Receive: " + data + "\n")
+	fmt.Print("[*] Receive [" + time.Now().Format("2006-01-02 15:04:05") + "]: " + data + "\n")
 
 	//定义扩展事件方法
 	events := make(map[string]func(ws *websocket.Conn, data interface{}, to interface{}))

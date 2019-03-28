@@ -7,6 +7,8 @@ import (
 	"strings"
 	"strconv"
 	"go-websocket/core"
+	"regexp"
+	"time"
 )
 
 type ConsoleService struct {
@@ -40,6 +42,8 @@ func (t *ConsoleService) main(ch chan string){
 			t.count(input)
 		case "connect":
 			t.connect(input)
+		case "publish":
+			t.publish(input)
 		default:
 			fmt.Print("[*] Error : Unknown command, please output 'help' to view the document. \n")
 		}
@@ -66,6 +70,7 @@ func (t *ConsoleService) help(input string){
 	fmt.Print("[*] help    		Help message. \n")
 	fmt.Print("[*] count   		Client coonect count. \n")
 	fmt.Print("[*] connect 		Client coonect list. \n")
+	fmt.Print("[*] publish 		Publish message. \n")
 }
 
 func (t *ConsoleService) count(input string){
@@ -75,7 +80,25 @@ func (t *ConsoleService) count(input string){
 func (t *ConsoleService) connect(input string){
 	fmt.Print("----------------------------------- CLIENT ------------------------------------------ \n")
 	for i:=0;i<len(t.WebSocketService.Clients);i++ {
-		fmt.Print("["+strconv.Itoa(i)+"]	[" + t.WebSocketService.Clients[i].Time.Format("2006-01-02 15:04:05") + "]		" + t.WebSocketService.Clients[i].Id + "\n")
+		fmt.Print("["+strconv.Itoa(i)+"] [" + t.WebSocketService.Clients[i].Time.Format("2006-01-02 15:04:05") + "]		" + t.WebSocketService.Clients[i].Id + "\n")
 	}
 	fmt.Print("------------------------------------------------------------------------------------- \n")
+}
+
+func (t *ConsoleService) publish(input string){
+	//整理输入
+	reg := regexp.MustCompile(`(\s)+`)
+	str := reg.ReplaceAll([]byte(input), []byte(" "))
+	params := strings.Split(string(str)," ")
+	//获取参数
+	var msg string
+	if len(params) > 1 {
+		msg = params[1]
+	} else {
+		msg = ""
+	}
+	//发布信息
+	t.WebSocketService.Publish(msg)
+	date := time.Now().Format("2006-01-02 15:04:05")
+	fmt.Print("[*] Publish [" + date + "]: " + msg + " \n")
 }
