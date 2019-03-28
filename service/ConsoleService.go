@@ -29,15 +29,17 @@ func (t *ConsoleService) main(ch chan string){
 		//fmt.Print("commad-> ")
 		inputReader := bufio.NewReader(os.Stdin)
 		input, _ := inputReader.ReadString('\n')
-		input = strings.Replace(input, " ", "", -1)
 		input = strings.Replace(input, "\n", "", -1)
 		input = strings.Replace(input, "\r", "", -1)
+		operate := strings.Split(input," ")[0]
 		//执行帮助
-		switch input {
+		switch operate {
 		case "help":
-			t.help()
+			t.help(input)
 		case "count":
-			t.count()
+			t.count(input)
+		case "connect":
+			t.connect(input)
 		default:
 			fmt.Print("[*] Error : Unknown command, please output 'help' to view the document. \n")
 		}
@@ -60,11 +62,20 @@ func (t *ConsoleService) welcome(){
 	fmt.Print("[*] Please enter a command( enter 'help' to view ): \n")
 }
 
-func (t *ConsoleService) help(){
-	fmt.Print("[*] help		Help message. \n")
-	fmt.Print("[*] count		Client coonect count. \n")
+func (t *ConsoleService) help(input string){
+	fmt.Print("[*] help    		Help message. \n")
+	fmt.Print("[*] count   		Client coonect count. \n")
+	fmt.Print("[*] connect 		Client coonect list. \n")
 }
 
-func (t *ConsoleService) count(){
+func (t *ConsoleService) count(input string){
 	fmt.Print("[*] Client connect count : " + strconv.Itoa(len(t.WebSocketService.Connects)) + "\n")
+}
+
+func (t *ConsoleService) connect(input string){
+	fmt.Print("----------------------------------- CLIENT ------------------------------------------ \n")
+	for i:=0;i<len(t.WebSocketService.Clients);i++ {
+		fmt.Print("["+strconv.Itoa(i)+"]	[" + t.WebSocketService.Clients[i].Time.Format("2006-01-02 15:04:05") + "]		" + t.WebSocketService.Clients[i].Id + "\n")
+	}
+	fmt.Print("------------------------------------------------------------------------------------- \n")
 }
