@@ -13,6 +13,7 @@ import (
 type ApiService struct {
 	Config				*core.Config
 	WebSocketService	*WebSocketService
+	core.ApiResponse
 }
 
 // 开始监听API
@@ -29,23 +30,6 @@ func (t *ApiService) Listen(){
 	http.HandleFunc("/events", t.Events)
 }
 
-// 按接口结构输出结果
-func (t *ApiService) apiResponse(w http.ResponseWriter, r *http.Request, code int, message string, data interface{}){
-	//设置HTTP头
-	w.Header().Set("Access-Control-Allow-Origin","*")
-	w.Header().Set("Content-type","application/json;charset='utf-8'")
-
-	//设置返回格式
-	result := make(map[string]interface{})
-	result["code"] = code
-	result["message"] = message
-	result["data"] = data
-
-	//设置返回内容
-	response,_ := json.Marshal(result)
-	w.Write(response)
-}
-
 /**
  * 连接数量
  * @OA\Get(
@@ -58,7 +42,7 @@ func (t *ApiService) apiResponse(w http.ResponseWriter, r *http.Request, code in
  */
 func (t *ApiService) Count(w http.ResponseWriter, r *http.Request) {
 	//接口返回
-	t.apiResponse(w, r, 0, "OK", len(t.WebSocketService.Connects))
+	t.ApiResponse.Send(w, r, 0, "OK", len(t.WebSocketService.Connects))
 }
 
 /**
@@ -79,7 +63,7 @@ func (t *ApiService) Publish(w http.ResponseWriter, r *http.Request) {
 	//广播消息
 	t.WebSocketService.Publish(message)
 	//接口返回
-	t.apiResponse(w, r, 0, "OK", message)
+	t.ApiResponse.Send(w, r, 0, "OK", message)
 }
 
 /**
@@ -102,7 +86,7 @@ func (t *ApiService) Clients(w http.ResponseWriter, r *http.Request) {
 		list = append(list, item)
 	}
 	//接口返回
-	t.apiResponse(w, r, 0, "OK", list)
+	t.ApiResponse.Send(w, r, 0, "OK", list)
 }
 
 /**
@@ -139,5 +123,5 @@ func (t *ApiService) Events(w http.ResponseWriter, r *http.Request) {
 		t.WebSocketService.Send(to, response)
 	}
 	//接口返回
-	t.apiResponse(w, r, 0, "OK", result)
+	t.ApiResponse.Send(w, r, 0, "OK", result)
 }
