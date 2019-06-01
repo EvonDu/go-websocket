@@ -18,11 +18,6 @@ type ApiService struct {
 
 // 开始监听API
 func (t *ApiService) Listen(){
-	//注册文档
-	if t.Config.Swagger {
-		http.Handle("/swagger/", http.FileServer(http.Dir("./")))
-	}
-
 	//注册接口
 	http.HandleFunc("/count", t.Count)
 	http.HandleFunc("/publish", t.Publish)
