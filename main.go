@@ -28,14 +28,14 @@ func main() {
 //注册Web
 func registerWeb(config *core.Config){
 	//注册JS
-	http.Handle("/js/", http.FileServer(http.Dir("./")))
+	http.Handle("/js/", http.FileServer(http.Dir("./web/")))
 	//注册文档
 	if config.Swagger {
-		http.Handle("/swagger/", http.FileServer(http.Dir("./")))
+		http.Handle("/swagger/", http.FileServer(http.Dir("./web")))
 	}
 	//注册测试页
 	if config.Test {
-		http.Handle("/test/", http.FileServer(http.Dir("./")))
+		http.Handle("/test/", http.FileServer(http.Dir("./web")))
 	}
 }
 
