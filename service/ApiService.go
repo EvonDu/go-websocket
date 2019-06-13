@@ -2,9 +2,8 @@ package service
 
 import (
 	"net/http"
-	"io/ioutil"
-	"go-websocket/core"
 	"encoding/json"
+	"go-websocket/core"
 )
 
 /**
@@ -47,14 +46,17 @@ func (t *ApiService) Count(w http.ResponseWriter, r *http.Request) {
  *      tags={"WebSocket"},
  *      summary="发布信息",
  *      description="向所有WebSocket客户端发送信息",
- *      @OA\Parameter(name="message", required=true, in="query",description="信息内容", @OA\Schema(type="string", default="测试信息")),
+ *      @OA\RequestBody(required=true, @OA\MediaType(
+ *          mediaType="application/x-www-form-urlencoded", @OA\Schema(
+ *              @OA\Property(description="信息内容", property="message", type="string", default="测试信息"),
+ *          )
+ *      )),
  *      @OA\Response(response="default", description="返回结果"),
  * )
  */
 func (t *ApiService) Publish(w http.ResponseWriter, r *http.Request) {
-	//获取参数(BODY)
-	body, _ := ioutil.ReadAll(r.Body)
-	message := string(body)
+	//获取参数
+	message := r.PostFormValue("message")
 	//广播消息
 	t.WebSocketService.Publish(message)
 	//接口返回
