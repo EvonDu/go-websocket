@@ -1,7 +1,3 @@
-<?php
-    $config = include "../config/main.php";
-?>
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -39,7 +35,7 @@
     var ws = null;
     var connecting = false;
     function websocketInit(){
-        ws = new websocket_io("ws://127.0.0.1:8080");
+        ws = new websocket_io("ws://" + location.host);
         ws.onopen = function() {
             connecting = true;
             printMessage("连接成功!");
@@ -53,7 +49,7 @@
             printMessage("收到信息："+ data);
         };
         ws.onevent["publish"] = function(data) {
-            printMessage("收到事件[publish]："+ data);
+            printMessage("收到广播[publish]："+ data);
         };
     }
 
@@ -70,7 +66,7 @@
         ws.send("publish", input.value);
 
         //输出信息
-        printMessage("发送消息[publish]："+input.value);
+        printMessage("发送广播[publish]："+input.value);
 
         //清空信息
         input.value = "";
